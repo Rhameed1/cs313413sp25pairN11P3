@@ -30,20 +30,20 @@ public class Draw implements Visitor<Void> {
 
     @Override
     public Void onStrokeColor(final StrokeColor c) {
-        int originalColor = paint.getColor();
+        int color = paint.getColor();
         paint.setColor(c.getColor());
         c.getShape().accept(this);
-        paint.setColor(originalColor);
+        paint.setColor(color);
 
         return null;
     }
 
     @Override
     public Void onFill(final Fill f) {
-        Paint.Style styleX = paint.getStyle();
+        Paint.Style style = paint.getStyle();
         paint.setStyle(Style.FILL_AND_STROKE);
         f.getShape().accept(this);
-        paint.setStyle(styleX);
+        paint.setStyle(style);
 
         return null;
     }
@@ -76,11 +76,10 @@ public class Draw implements Visitor<Void> {
 
     @Override
     public Void onOutline(Outline o) {
-        Paint.Style styleX = paint.getStyle();
+        Paint.Style style = paint.getStyle();
         paint.setStyle(Style.STROKE);
         o.getShape().accept(this);
-        paint.setStyle(styleX);
-
+        paint.setStyle(style);
 
         return null;
     }
@@ -88,9 +87,20 @@ public class Draw implements Visitor<Void> {
     @Override
     public Void onPolygon(final Polygon s) {
 
-        final float[] pts = null;
-
+        Point[] points = new Point[s.getPoints().size()];
+        for(int i = 0; i < points.length; i++) points[i] = s.getPoints().get(i);
+        final float[] pts = new float[points.length * 4];
+        int i = 0;
+        for (int j = 0; j < points.length; j++) {
+            Point p1 = points[j];
+            Point p2 = points[(j + 1) % points.length];
+            pts[i++] = (float) p1.getX();
+            pts[i++] = (float) p1.getY();
+            pts[i++] = (float) p2.getX();
+            pts[i++] = (float) p2.getY();
+        }
         canvas.drawLines(pts, paint);
+
         return null;
     }
 }
