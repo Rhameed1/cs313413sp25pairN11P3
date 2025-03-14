@@ -30,36 +30,57 @@ public class Draw implements Visitor<Void> {
 
     @Override
     public Void onStrokeColor(final StrokeColor c) {
+        int originalColor = paint.getColor();
+        paint.setColor(c.getColor());
+        c.getShape().accept(this);
+        paint.setColor(originalColor);
 
         return null;
     }
 
     @Override
     public Void onFill(final Fill f) {
+        Paint.Style styleX = paint.getStyle();
+        paint.setStyle(Style.FILL_AND_STROKE);
+        f.getShape().accept(this);
+        paint.setStyle(styleX);
 
         return null;
     }
 
     @Override
     public Void onGroup(final Group g) {
-
+        for (Shape shape : g.getShapes()) {
+            shape.accept(this);
+        }
         return null;
     }
 
     @Override
     public Void onLocation(final Location l) {
+        canvas.save();
+        canvas.translate(l.getX(), l.getY());
+        l.getShape().accept(this);
+        canvas.translate(-l.getX(), -l.getY());
+        canvas.restore();
 
         return null;
     }
 
     @Override
     public Void onRectangle(final Rectangle r) {
+        canvas.drawRect(0,0, r.getWidth(), r.getHeight(), paint);
 
         return null;
     }
 
     @Override
     public Void onOutline(Outline o) {
+        Paint.Style styleX = paint.getStyle();
+        paint.setStyle(Style.STROKE);
+        o.getShape().accept(this);
+        paint.setStyle(styleX);
+
 
         return null;
     }
