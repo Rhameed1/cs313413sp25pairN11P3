@@ -67,6 +67,22 @@ public class BoundingBox implements Visitor<Location> {
 
     @Override
     public Location onPolygon(final Polygon s) {
-        return null;
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        for (Point p : s.getPoints()){
+            minX = Math.min(minX, p.getX());
+            maxX = Math.max(maxX, p.getX());
+            minY = Math.min(minY, p.getY());
+            maxY = Math.max(maxY, p.getY());
+        }
+
+        int width = maxX - minX;
+        int height = maxY - minY;
+
+
+        return new Location(minX, minY, new Rectangle(width, height));
     }
 }
